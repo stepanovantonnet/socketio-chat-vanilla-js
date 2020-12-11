@@ -1,0 +1,26 @@
+{
+  "name": "socketio-chat-webcomponents-vanilla",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stepanovantonnet/socketio-chat-webcomponents-vanilla.git"
+  },
+  "keywords": [
+    "socketio",
+    "vanilla-js",
+    "chat",
+    "web",
+    "components"
+  ],
+  "author": "antonstepanov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stepanovantonnet/socketio-chat-webcomponents-vanilla/issues"
+  },
+  "homepage": "https://github.com/stepanovantonnet/socketio-chat-webcomponents-vanilla#readme"
+}
