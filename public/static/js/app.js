@@ -1,3 +1,5 @@
+import EventBus from "./lib/event-bus.js";
+
 //
 // CONFIG
 //
@@ -64,9 +66,93 @@ const joinRoom = (socket, username) => {
   });
 };
 
+const initRoomLobby = (state, socket) => () => {
+  const mainEl = document.querySelector("main");
+  const chatLobbyEl = document.createElement("chat-lobby");
+  chatLobbyEl.avatars = config.users;
+
+  const userSelectedHandler = async (e) => {
+    await joinRoom(socket, e.detail.user);
+    state.username = e.detail.user.username;
+    socket.emit("MESSAGE", `${e.detail.user.username} joined chat room!`);
+    //
+    mainEl.querySelector("chat-lobby").remove();
+    window.EventBus.dispatchEvent("user_joined");
+  };
+  chatLobbyEl.addEventListener("user_selected", userSelectedHandler);
+  mainEl.appendChild(chatLobbyEl);
+
+  console.log('window.EventBus.dispatchEvent."user_joined"');
+};
+
+const addMessageToList = (state, messageList) => (payload) => {
+  console.log("addMessageToList.state:", state);
+  console.log("addMessageToList.payload", payload);
+
+  const { username, timestamp, text } = payload;
+  var linkExtractorRE = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
+
+  const newMessage = {
+    username,
+    timestamp,
+    self: state.username === username,
+    text: text.replace(linkExtractorRE, "*link*"),
+    urls: text.match(linkExtractorRE),
+  };
+
+  console.log("newMessage:", newMessage);
+  state.messages.push(newMessage);
+  messageList.addMessage(newMessage);
+};
+
+const initChatArea = (state, socket) => () => {
+  const mainEl = document.querySelector("main");
+  const chatAreaEl = document.createElement("chat-area");
+  chatAreaEl.avatars = config.users;
+  console.log("chatAreaEl:", chatAreaEl);
+  mainEl.appendChild(chatAreaEl);
+
+  const msg1 = {
+    username: "user_a",
+    urls: [],
+    timestamp: Date.now(),
+    text:
+      "connectedCallback() fires when the element is inserted into the DOM. https://i.imgur.com/Q6pAkWlb.jpg https://i.imgur.com/Jt9fyBZb.jpg",
+  };
+
+  const msg2 = {
+    username: "user_a",
+    urls: [],
+    timestamp: Date.now(),
+    text:
+      "If that’s you, you’ll probably need to @import whatever global stylesheets you can to bring in those global styles and hope t.",
+  };
+  const msg3 = {
+    username: "user_b",
+    urls: [],
+    timestamp: Date.now(),
+    text: "connectedCallback() fires when the element is ",
+  };
+  const msg4 = {
+    username: "user_b",
+    self: true,
+    urls: [],
+    timestamp: Date.now(),
+    text:
+      "connectedCallback() fires when the element is inserted into the DOM. It's a good place to set the initial role, tabindex, internal state, and install event listeners.",
+  };
+
+
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg1), 500);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 1000);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 1500);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg4), 4000);
+};
+
 // Listen for DOM to load, before setting up
 document.addEventListener("DOMContentLoaded", async () => {
   console.log("DOMContentLoaded:");
+  window.EventBus = new EventBus();
 
   //STATE - INITIAL SETTINGS
   const initialState = {
@@ -86,7 +172,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   socket.on("connect", function () {
     console.log("connected");
   });
-  
+
   socket.on("MESSAGE", (payload) => {
     console.log("MESSAGE.payload:", payload);
   });
@@ -95,16 +181,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   //console.log("joined");
 
   // LOBBY SETUP
-  const mainEl = document.querySelector("main");
-  const chatLobbyEl = document.createElement("chat-lobby");
-  chatLobbyEl.avatars = config.users;
-  const userSelectedHandler = async (e) => {
-    await joinRoom(socket, e.detail.user);
-    state.username = e.detail.user.username;
-    socket.emit("MESSAGE", `${e.detail.user.username} joined chat room!`);
-  };
+  await initRoomLobby(state, socket)();
 
-  chatLobbyEl.addEventListener("user_selected", userSelectedHandler);
+  window.EventBus.addEventListener("user_joined", () => {
+    console.log("user_joined:");
+    //CHAT SETUP
+    initChatArea(state, socket)();
+  });
 
-  mainEl.appendChild(chatLobbyEl);
+  window.EventBus.addEventListener("open_settings", () => {
+    console.log("open_settings:");
+  });
+
+
 });

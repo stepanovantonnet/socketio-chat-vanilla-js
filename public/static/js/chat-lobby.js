@@ -89,24 +89,16 @@ window.customElements.define(
       this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
-    connectedCallback() {
-      /* this.attachShadow({ mode: "open" });
-      const lobbyNode = template.content.cloneNode(true);
-
-      this.updateAvatars = this._updateAvatars.bind(this);
-
-      this.shadowRoot.appendChild(lobbyNode);
-      console.log("this.shadowRoot:", this.shadowRoot); */
-      //this._updateAvatars();
-    }
+    connectedCallback() {}
 
     disconnectedCallback() {
       const btnGroup = this.shadowRoot.querySelector(".avatar-button-group");
-      //ADD LISTENERS
+
+      //remove listeners
       this.shadowRoot
         .querySelectorAll(".avatar-button-group")
         .forEach((btn) => {
-          btn.addEventListener("click", this._userSelected.bind(this));
+          btn.removeEventListener("click", this._userSelected.bind(this));
         });
     }
 
@@ -115,6 +107,7 @@ window.customElements.define(
       const btnGroup = this.shadowRoot.querySelector(".avatar-button-group");
 
       btnGroup.querySelectorAll("*").forEach((n) => n.remove());
+
       this._avatars.forEach((user) => {
         //create button
         const avatarBtn = document.createElement("button");
@@ -155,8 +148,7 @@ window.customElements.define(
     //
     /**
     * This is a setter which lobby avatars
-    @param list - array of { name:string, image_src:string }
-
+        @param list - array of { name:string, image_src:string }
     */
     set avatars(list) {
       console.log("this:", this);

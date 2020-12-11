@@ -26,6 +26,7 @@ main {
     justify-content: center;
     max-width: 1024px;
     height: 100vh;
+    margin: 0 auto;
 }
 
 /* Typography */
