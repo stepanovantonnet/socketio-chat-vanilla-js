@@ -141,6 +141,20 @@ modalTemplate.innerHTML = `
             flex-direction: column;
         }
 
+        .username-input-container {
+            padding: 2rem 1rem 1rem 1rem;
+            
+        }
+        .username-input-container input {
+            
+            margin: 0px 1rem;
+            padding: 4px;
+        }
+        .username-label {
+            display:block;
+            margin-bottom: 1rem;
+        }
+
     </style>
     <div class="modal">
             <div class="modal-content">
@@ -149,6 +163,7 @@ modalTemplate.innerHTML = `
                     <span class="close">&times;</span>
                 </div>
                 <div class="modal-body">
+                
                 <div class="radio-container">
                     <span class="radio-group-label">Clock display</span>
                     <radio-group id="radio-clock-display">
@@ -167,6 +182,11 @@ modalTemplate.innerHTML = `
                     </radio-group>
                 </div>
         
+                <div class="username-input-container">
+                    <span class="username-label">Username change</span>
+                    <input type="text" id="username-input">
+                </div>
+
                 <div class="reset-container">
                     <button id="button-reset">Reset to defaults</button>
                 </div>
@@ -183,15 +203,16 @@ window.customElements.define(
   "settings-modal",
   class extends HTMLElement {
     static get observedAttributes() {
-      return ["radio-send-shortcut", "radio-clock-display"];
+      return ["radio-send-shortcut", "radio-clock-display", "username"];
     }
     constructor(props) {
       super(props);
 
       this.attachShadow({ mode: "open" });
       const modalNode = modalTemplate.content.cloneNode(true);
-
       this.shadowRoot.appendChild(modalNode);
+
+      this.usernameInput = this.shadowRoot.getElementById("username-input");
     }
 
     connectedCallback() {
@@ -206,6 +227,11 @@ window.customElements.define(
       this.shadowRoot
         .getElementById("button-demo")
         .addEventListener("click", this._demoClick.bind(this));
+
+      this.usernameInput.addEventListener(
+        "keydown",
+        this._onUsernameChange.bind(this)
+      );
     }
 
     disconnectedCallback() {
@@ -223,12 +249,25 @@ window.customElements.define(
     }
 
     attributeChangedCallback(name, oldValue, newValue) {
-      const radioGroup = this.shadowRoot.getElementById(name);
-      radioGroup.setAttribute("selected-value", newValue);
+      if (name.startsWith("radio")) {
+        const radioGroup = this.shadowRoot.getElementById(name);
+        radioGroup.setAttribute("selected-value", newValue);
+      } else if (name === "username") {
+        this.usernameInput.value = newValue;
+      }
     }
 
     _resetClick() {
       window.EventBus.dispatchEvent("settings-reset");
+    }
+
+    _onUsernameChange(e) {
+      if (e.keyCode === 13) {
+        window.EventBus.dispatchEvent("username-update", {
+          value: this.usernameInput.value,
+        });
+        this.usernameInput.blur();
+      }
     }
 
     _demoClick() {
@@ -342,4 +381,3 @@ window.customElements.define(
   }
 );
 
-//window.customElements.define('radio-group', RadioGroup);

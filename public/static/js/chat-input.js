@@ -5,13 +5,14 @@ const resizeHandler = (textarea) => () => {
   textarea.style.height = "auto";
   textarea.style.height = textarea.scrollHeight + "px";
 };
+
 const delayedResizeHandler = (textarea) => () =>
   setTimeout(resizeHandler(textarea), 0);
 
 const emojiStringToArray = (str) => {
   const split = str.split(/([\uD800-\uDBFF][\uDC00-\uDFFF])/);
   const arr = [];
-  for (var i = 0; i < split.length; i++) {
+  for (let i = 0; i < split.length; i++) {
     const char = split[i];
     if (char !== "") {
       arr.push(char);

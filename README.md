@@ -1,20 +1,35 @@
 # Socket IO chat client and basic chat room
 
-About
+Vanila Javascript Chat Client based on webcomponents, shadow dom and internal templates for rendering performance.
 
 ## FEATURES
 
-- [ ] Feature
-- [x] Checked feature
+- [x] Input field to type and send messages
+- [x] The user’s messages should be on the right and the other user’s
+messages should be on the left
+- [x] Each message has the time it was sent
+- [x] button to send the message
+- [x] Users can send pictures via URL. When sent, this URL is rendered on the
+      message box as an image
+- [x] Change username input field
+- [x] Change clock display radio inputs
+- [x] Send messages with Ctrl/Cmd + ENTER toggle
+- [x] Have a text/link to reset all the settings back to its defaults
+- [x] settings consumed and saved in the LocalStorage
+- [x] message image parser
+
+---
+
+- [x] Chat room lobby with sample users selection
+- [x] sample user avatars
+- [x] random emoji button
+- [x] demo messages
 
 ## Demo
 
-GIF
-GIF
-GIF
+![](chat-demo.gif)
 
 ## Installation instructions for command line
-
 
 1. Clone this repository:
 
@@ -45,4 +60,3 @@ GIF
    ```bash
    http://localhost:3000
    ```
-

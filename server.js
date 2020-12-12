@@ -15,7 +15,6 @@ io.on("connection", (socket) => {
   // set username and
   // place all users into "room1"
   socket.on("SET_USERNAME", (user) => {
-    console.log("user:", user);
     socket.username = user.username;
     socket.join("room1");
     io.to("room1").emit("USER_JOINED", socket.username);

@@ -6,11 +6,7 @@ body {
 
 body {
     font-family: 'Futura', 'Open Sans', sans-serif, -apple-system;
-    /* --nav-width: 200px;
-    margin: 0 0 0 var(--nav-width); */
-    /* font-family: 'Quicksand', sans-serif; */
     height: 100%;
-
     background: #1c92d2;
     /* fallback for old browsers */
     background: -webkit-linear-gradient(to right, #f2fcfe, #1c92d2);
@@ -28,53 +24,4 @@ main {
     height: 100%;
     margin: 0 auto;
     overflow: hidden;
-}
-
-/* Typography */
-h3 {
-    color: #767676
-        /*  color:#b3bec9 */
-}
-
-/* Controls */
-
-radio-button {
-    cursor: pointer;
-    position: relative;
-    display: inline-block;
-    font-size: 18px;
-    left: 30px;
-    margin-right: 32px;
-}
-
-radio-button:focus {
-    outline: none;
-}
-
-radio-button::before {
-    content: '';
-    display: block;
-    width: 10px;
-    height: 10px;
-    border: 1px solid black;
-    position: absolute;
-    left: -18px;
-    top: 7px;
-    border-radius: 50%;
-}
-
-radio-button:focus::before {
-    box-shadow: 0 0 3px 3px #83BEFF;
-}
-
-radio-button[aria-checked="true"]::before {
-    content: '';
-    display: block;
-    width: 10px;
-    height: 10px;
-    background: red;
-    position: absolute;
-    left: -18px;
-    top: 7px;
-    border-radius: 50%;
 }

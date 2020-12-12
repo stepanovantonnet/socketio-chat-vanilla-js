@@ -27,6 +27,7 @@ template.innerHTML = `
         /* height: 100%; */
         padding: 2rem;
         margin: 0 auto;
+        text-align:center;
         max-width: 600px;
     
     

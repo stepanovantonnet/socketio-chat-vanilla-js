@@ -63,14 +63,38 @@ messageCardTemplate.innerHTML = `
         max-height:200px;
         max-width:200px;
     }
+    .avatar-container {
+        position:relative;
+        min-height:75px;
+        min-width:75px;
+    }
+    .avatar-fallback {
+        position:absolute;
+        height:75px;
+        width:75px;
+        border-radius:50%;
+        color:grey;
+        background: #FFF;
+        text-align: center;
+        line-height: 32px;
+        font-weight: 700;
+        margin-right: 5px;
+        color: #FFFFFF;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+    }
     .avatar {
+        position:absolute;
         flex-grow:0;
         flex-shrink:0;
         height:75px;
         width:75px;
         border-radius:50%;
         overflow:hidden;
+        
     }
+   
     
     .message-intro-animation {
         animation-duration: .45s;
@@ -90,8 +114,14 @@ messageCardTemplate.innerHTML = `
     </style>
     <div class="container message-intro-animation">
         <slot name="username"></slot>
-        <div class="avatar">
-            <slot name="avatar-image"></slot>
+        
+        <div class="avatar-container">
+            <div class="avatar-fallback">
+                <slot name="avatar-text"></slot>
+            </div>
+            <div class="avatar">
+                <slot name="avatar-image"></slot>
+            </div>
         </div>
 
         <div class="message-body">
@@ -123,10 +153,9 @@ customElements.define(
 
       const messageCardNode = messageCardTemplate.content.cloneNode(true);
 
-      this.isAvatarHidden &&
-        (messageCardNode.querySelector(".avatar").style.visibility = "hidden");
-
       if (this.isSelf) {
+        messageCardNode.querySelector(".avatar-fallback").style.visibility =
+          "hidden";
         messageCardNode.querySelector(".avatar").style.visibility = "hidden";
         messageCardNode
           .querySelector(".container")
@@ -134,6 +163,10 @@ customElements.define(
         messageCardNode
           .querySelector(".message-container")
           .classList.add("message-container__self");
+      } else if (this.isAvatarHidden) {
+        messageCardNode.querySelector(".avatar-fallback").style.visibility =
+          "hidden";
+        messageCardNode.querySelector(".avatar").style.visibility = "hidden";
       }
       this.shadowRoot.appendChild(messageCardNode);
     }

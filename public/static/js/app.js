@@ -48,22 +48,6 @@ const initSettings = (state) => {
   return Object.fromEntries(
     Object.entries(state).map(([key, defaultValue]) => {
       const value = localStorage.getItem(key) || defaultValue;
-
-      //RADIO GROUPS
-      if (key.startsWith("radio")) {
-        const el = document.getElementById(key);
-        if (el) {
-          el.selectedValue = value;
-        }
-      }
-      //SETUP MORE COMPONENTS
-      console.log("key:", key);
-      if (key === "radio-send-shortcut") {
-        const messageInputEl = document.querySelector("message-input");
-        if (messageInputEl) {
-          messageInputEl.keysend = value;
-        }
-      }
       //return state key value array
       return [key, value];
     })
@@ -102,6 +86,14 @@ const initRoomLobby = (state, socket) => () => {
   mainEl.appendChild(chatLobbyEl);
 };
 
+const usernameUpdate = (state, socket) => (newUsername) => {
+  socket.emit("SET_USERNAME", { username: newUsername });
+  const oldUsername = state.username;
+  state.username = newUsername;
+
+  socket.emit("MESSAGE", `"${oldUsername}" changed name to "${newUsername}"`);
+};
+
 const sendChatMessage = (socket) => (text) => {
   socket.emit("MESSAGE", text);
 };
@@ -118,7 +110,6 @@ const addMessageToList = (state, messageList) => (payload) => {
     urls: text.match(linkExtractorRE),
   };
 
-  //console.log("newMessage:", newMessage);
   state.messages.push(newMessage);
   messageList.addMessage(newMessage);
 };
@@ -127,7 +118,6 @@ const initChatArea = (state, socket) => () => {
   const mainEl = document.querySelector("main");
   const chatAreaEl = document.createElement("chat-area");
   chatAreaEl.avatars = config.users;
-  console.log("chatAreaEl:", chatAreaEl);
   mainEl.appendChild(chatAreaEl);
 };
 
@@ -138,7 +128,6 @@ const receiveChatMessage = (state) => (payload) => {
     addMessageToList(state, chatAreaEl)(payload);
   }
 };
-
 
 const addDemoMessages = (state) => {
   const chatAreaEl = document.querySelector("chat-area");
@@ -161,15 +150,15 @@ const addDemoMessages = (state) => {
     username: "user_c",
     urls: [],
     timestamp: Date.now(),
-    text: "Cats are supposed to have 18 toes (five toes on each front paw; four toes on each back paw).",
+    text:
+      "Cats are supposed to have 18 toes (five toes on each front paw; four toes on each back paw).",
   };
   const msg4 = {
     username: "user_b",
     self: true,
     urls: [],
     timestamp: Date.now(),
-    text:
-      "Cats can jump up to six times their length.",
+    text: "Cats can jump up to six times their length.",
   };
   const msg5 = {
     username: "user_a",
@@ -246,8 +235,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       "radio-send-shortcut",
       state["radio-send-shortcut"]
     );
+    settingsModalEl.setAttribute("username", state.username);
   });
 
+  // handle radio changes within state and forward change events
   window.EventBus.addEventListener("radio-group-change", (e) => {
     localStorage.setItem(e.detail.key, e.detail.value);
     state[e.detail.key] = e.detail.value;
@@ -268,13 +259,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   window.EventBus.addEventListener("settings-reset", () => {
     resetStateSettings(state);
   });
+  window.EventBus.addEventListener("username-update", (e) => {
+    usernameUpdate(state, socket)(e.detail.value);
+  });
 
   window.EventBus.addEventListener("demo-messages", () => {
     addDemoMessages(state);
   });
 
   window.EventBus.addEventListener("send_message", (e) => {
-    //console.log("send_message:", e.detail.text);
     sendChatMessage(socket)(e.detail.text);
   });
 });

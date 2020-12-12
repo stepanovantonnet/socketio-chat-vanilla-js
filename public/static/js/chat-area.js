@@ -1,6 +1,3 @@
-//
-// HELPERS
-//
 
 // TEMPLATE
 const template = document.createElement("template");
@@ -123,11 +120,17 @@ window.customElements.define(
       }
 
       msgCard.innerHTML = `
-           <img 
-            slot="avatar-image" 
-            style="width:100%;height:100%"
-            src="${user.image_src}" 
-           /> 
+            <span slot="avatar-text" style="color:grey;">
+                ${String(username).slice(0, 1).toUpperCase()}
+            </span>
+            <div slot="avatar-image" style="color:grey">
+                <img 
+                    style="width:100%;height:100%"
+                    src="${user.image_src}" 
+                    onerror="this.style.display='none'"
+                /> 
+
+            </div>
            ${
              urls &&
              urls
