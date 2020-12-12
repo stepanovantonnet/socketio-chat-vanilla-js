@@ -34,13 +34,13 @@ messages should be on the left
 1. Clone this repository:
 
    ```bash
-   git clone https://github.com/stepanovantonnet/socketio-chat-webcomponents-vanilla
+   git clone https://github.com/stepanovantonnet/socketio-chat-vanilla-js
    ```
 
 2. Navigate to the cloned directory:
 
    ```bash
-   cd socketio-chat-webcomponents-vanilla
+   cd socketio-chat-vanilla-js
    ```
 
 3. Install dependencies:
