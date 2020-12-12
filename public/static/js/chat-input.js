@@ -9,10 +9,10 @@ const delayedResizeHandler = (textarea) => () =>
   setTimeout(resizeHandler(textarea), 0);
 
 const emojiStringToArray = (str) => {
-  split = str.split(/([\uD800-\uDBFF][\uDC00-\uDFFF])/);
-  arr = [];
+  const split = str.split(/([\uD800-\uDBFF][\uDC00-\uDFFF])/);
+  const arr = [];
   for (var i = 0; i < split.length; i++) {
-    char = split[i];
+    const char = split[i];
     if (char !== "") {
       arr.push(char);
     }

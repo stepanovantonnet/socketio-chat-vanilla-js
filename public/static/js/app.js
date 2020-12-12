@@ -85,6 +85,10 @@ const initRoomLobby = (state, socket) => () => {
   console.log('window.EventBus.dispatchEvent."user_joined"');
 };
 
+const sendChatMessage = (socket) => (text) => {
+  socket.emit("MESSAGE", text);
+};
+
 const addMessageToList = (state, messageList) => (payload) => {
   console.log("addMessageToList.state:", state);
   console.log("addMessageToList.payload", payload);
@@ -142,16 +146,22 @@ const initChatArea = (state, socket) => () => {
       "connectedCallback() fires when the element is inserted into the DOM. It's a good place to set the initial role, tabindex, internal state, and install event listeners.",
   };
 
-
   setTimeout(() => addMessageToList(state, chatAreaEl)(msg1), 500);
-  setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 1000);
-  setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 1500);
-  setTimeout(() => addMessageToList(state, chatAreaEl)(msg4), 4000);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 2000);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 3500);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg4), 4500);
+};
+
+const receiveChatMessage = (state) => (payload) => {
+  const chatAreaEl = document.querySelector("chat-area");
+  // chat area might not be in the dom before user has joined
+  if (chatAreaEl) {
+    addMessageToList(state, chatAreaEl)(payload);
+  }
 };
 
 // Listen for DOM to load, before setting up
 document.addEventListener("DOMContentLoaded", async () => {
-  console.log("DOMContentLoaded:");
   window.EventBus = new EventBus();
 
   //STATE - INITIAL SETTINGS
@@ -169,22 +179,20 @@ document.addEventListener("DOMContentLoaded", async () => {
   const socket = io({
     autoConnect: false,
   });
-  socket.on("connect", function () {
-    console.log("connected");
-  });
-
-  socket.on("MESSAGE", (payload) => {
-    console.log("MESSAGE.payload:", payload);
-  });
-
-  //await joinRoom(socket, "userA");
-  //console.log("joined");
 
   // LOBBY SETUP
   await initRoomLobby(state, socket)();
 
+  //
+  // EVENT HANDLERS
+  //
+
+  // Socket event handlers
+  socket.on("connect", () => console.log("connected"));
+  socket.on("MESSAGE", receiveChatMessage(state));
+
+  // Event bus handlers
   window.EventBus.addEventListener("user_joined", () => {
-    console.log("user_joined:");
     //CHAT SETUP
     initChatArea(state, socket)();
   });
@@ -193,5 +201,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.log("open_settings:");
   });
 
-
+  window.EventBus.addEventListener("send_message", (e) => {
+    //console.log("send_message:", e.detail.text);
+    sendChatMessage(socket)(e.detail.text);
+  });
 });
