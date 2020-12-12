@@ -30,6 +30,8 @@ template.innerHTML = `
           display: flex;
           padding: 1rem;
           background-color: #FFF;
+          animation-duration: .35s;
+          animation-name: slide-in
         }
         textarea {
           line-height:40px;
@@ -75,70 +77,19 @@ template.innerHTML = `
         button:hover svg {
             transform: scale(1.1);
         }
-  
-        .emoji-button-container {
-            position:relative;
-        }
-  
-        #tooltip {
-          background: #FFF;
-          color: white;
-          font-weight: bold;
-          padding: 8px 8px;
-          font-size: 20px;
-          border-radius: 4px;
-          display: none;
-          /* display:flex; */
-        }
-  
-        #tooltip[data-show] {
-          display:flex;
-        }
-  
-        #arrow,
-        #arrow::before {
-          position: absolute;
-          width: 8px;
-          height: 8px;
-          z-index: -1;
-        }
-  
-        #arrow::before {
-          content: "";
-          transform: rotate(45deg);
-          background: #FFF;
-        }
-        #tooltip[data-popper-placement^="top"] > #arrow {
-          bottom: -4px;
-        }
-  
-        #tooltip[data-popper-placement^="bottom"] > #arrow {
-          top: -4px;
-        }
-  
-        #tooltip[data-popper-placement^="left"] > #arrow {
-          right: -4px;
-        }
-  
-        #tooltip[data-popper-placement^="right"] > #arrow {
-          left: -4px;
-        }
-  
+           
+        @keyframes slide-in {
+            0% {
+              transform: translateY(10%);
+              opacity: 0;
+            }
+            100% {
+              transform: translateY(0);
+              opacity: 1;
+            }
+          }
       </style>
       <textarea rows="1" placeholder="Write something..."></textarea>
-      <div class="emoji-button-container">
-          <div id="tooltip" role="tooltip">
-              <button>
-              😊
-              </button>
-              <button>
-              😉
-              </button>
-             
-              <div id="arrow" data-popper-arrow></div>
-          </div>
-          
-      </div>
       <div class="send-button-container">
           <button id="emoji-button">
               <svg aria-hidden="true" focusable="false" data-prefix="far" data-icon="smile" class="svg-inline--fa fa-smile fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path fill="#b3bec9" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 448c-110.3 0-200-89.7-200-200S137.7 56 248 56s200 89.7 200 200-89.7 200-200 200zm-80-216c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm4 72.6c-20.8 25-51.5 39.4-84 39.4s-63.2-14.3-84-39.4c-8.5-10.2-23.7-11.5-33.8-3.1-10.2 8.5-11.5 23.6-3.1 33.8 30 36 74.1 56.6 120.9 56.6s90.9-20.6 120.9-56.6c8.5-10.2 7.1-25.3-3.1-33.8-10.1-8.4-25.3-7.1-33.8 3.1z"></path></svg>
@@ -162,6 +113,8 @@ class ChatInput extends HTMLElement {
 
     this.onSendClick = this._onSendClick.bind(this);
     this.onEmojiClick = this._onEmojiClick.bind(this);
+
+    this.onKeysendChange = this._onKeysendChange.bind(this);
   }
 
   //
@@ -190,6 +143,8 @@ class ChatInput extends HTMLElement {
 
     const button = this.shadowRoot.getElementById("send-button");
     console.log("button:", button);
+
+    window.EventBus.addEventListener("change_keysend", this.onKeysendChange);
   }
 
   disconnectedCallback() {
@@ -211,6 +166,8 @@ class ChatInput extends HTMLElement {
     this.shadowRoot
       .getElementById("emoji-button")
       .removeEventListener("click", this.onEmojiClick);
+
+    window.EventBus.addEventListener("change_keysend", this.onKeysendChange);
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
@@ -238,11 +195,17 @@ class ChatInput extends HTMLElement {
 
   _clear() {
     this.textarea.value = "";
+    resizeHandler(this.textarea)();
   }
 
   //
   // HANDLERS
   //
+
+  _onKeysendChange(e) {
+    this.keysend = e.detail.value;
+  }
+
   _onEmojiClick() {
     const emojis = emojiStringToArray("😊🥺😉😍😘😚😜😂😝😳😁😣😢😭😰🥰");
     const rndEmoji = emojis[Math.floor(Math.random() * emojis.length)];
@@ -276,7 +239,7 @@ class ChatInput extends HTMLElement {
   }
 
   get keysend() {
-    return this.getAttribute("keysend");
+    return this.getAttribute("keysend") || 'true';
   }
 }
 

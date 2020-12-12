@@ -33,7 +33,10 @@ template.innerHTML = `
             flex-direction: column;
             justify-content: flex-end;
         }
-
+        
+        .text {
+            white-space:pre-wrap;
+        }
         .app-bar {
             box-sizing:border-box;
             padding:1rem;
@@ -105,10 +108,12 @@ window.customElements.define(
       const prevMessage = this.messages[this.messages.length - 1];
 
       this.messages.push(message);
-
+      
       const msgCard = document.createElement("message-card");
+      console.log('message:', message)
+      //console.log("prevMessage:", prevMessage, username);
       const hideAvatar = prevMessage && prevMessage.username === username;
-      const { image_src } = this._avatarSelector(username);
+      const user = this._avatarSelector(username) || {};
 
       hideAvatar && msgCard.setAttribute("hide-avatar", true);
 
@@ -122,9 +127,26 @@ window.customElements.define(
            <img 
             slot="avatar-image" 
             style="width:100%;height:100%"
-            src="${image_src}" 
+            src="${user.image_src}" 
            /> 
-            <p slot="text">${text}</p>
+           ${
+             urls &&
+             urls
+               .map((url) => {
+                 //return `<message-image slot="image" class="message-image" data-src="${url}"/>`;
+                 return `<span slot="image">
+                  <message-image  class="message-image" data-src="${url}"/>
+              </span>`;
+               })
+               .join("")
+           }
+            <p class="text" slot="text">${text}</p>
+            <message-time 
+                slot="time" 
+                data-name="msg-timestamp" 
+                data-variant="${this._timeformat}" 
+                data-value="${timestamp}" 
+            />
           `;
 
       this.shadowRoot.querySelector(".messages-container").appendChild(msgCard);
@@ -136,12 +158,7 @@ window.customElements.define(
     //
 
     _avatarSelector(username) {
-      console.log("username:", username);
-      console.log("this._avatars:", this._avatars);
-      return this._avatars.find((a) => {
-        console.log("a.name:", a.name);
-        return a.name === username;
-      });
+      return this._avatars.find((a) => a.name === username);
     }
 
     //
@@ -156,7 +173,7 @@ window.customElements.define(
     // SETTERS AND GETTERS
     //
     /**
-    * This is a setter which lobby avatars
+    * user avatars map
         @param list - array of { name:string, image_src:string }
     */
     set avatars(list) {

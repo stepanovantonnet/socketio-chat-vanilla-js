@@ -5,6 +5,7 @@ import EventBus from "./lib/event-bus.js";
 //
 
 const config = {
+  //Users map
   users: [
     {
       name: "user_a",
@@ -18,7 +19,25 @@ const config = {
       name: "user_c",
       image_src: "https://randomuser.me/api/portraits/women/94.jpg",
     },
+    {
+      name: "user_d",
+      image_src: "https://randomuser.me/api/portraits/men/90.jpg",
+    },
+    {
+      name: "user_e",
+      image_src: "https://randomuser.me/api/portraits/men/91.jpg",
+    },
+    {
+      name: "user_f",
+      image_src: "https://randomuser.me/api/portraits/men/94.jpg",
+    },
   ],
+};
+
+//STATE - INITIAL SETTINGS
+const initialState = {
+  "radio-clock-display": "24h",
+  "radio-send-shortcut": "true",
 };
 
 //
@@ -81,8 +100,6 @@ const initRoomLobby = (state, socket) => () => {
   };
   chatLobbyEl.addEventListener("user_selected", userSelectedHandler);
   mainEl.appendChild(chatLobbyEl);
-
-  console.log('window.EventBus.dispatchEvent."user_joined"');
 };
 
 const sendChatMessage = (socket) => (text) => {
@@ -90,9 +107,6 @@ const sendChatMessage = (socket) => (text) => {
 };
 
 const addMessageToList = (state, messageList) => (payload) => {
-  console.log("addMessageToList.state:", state);
-  console.log("addMessageToList.payload", payload);
-
   const { username, timestamp, text } = payload;
   var linkExtractorRE = /(https?:\/\/(?:www\.|(?!www))[^\s\.]+\.[^\s]{2,}|www\.[^\s]+\.[^\s]{2,})/gi;
 
@@ -100,11 +114,11 @@ const addMessageToList = (state, messageList) => (payload) => {
     username,
     timestamp,
     self: state.username === username,
-    text: text.replace(linkExtractorRE, "*link*"),
+    text: text.replace(linkExtractorRE, "*image link*"),
     urls: text.match(linkExtractorRE),
   };
 
-  console.log("newMessage:", newMessage);
+  //console.log("newMessage:", newMessage);
   state.messages.push(newMessage);
   messageList.addMessage(newMessage);
 };
@@ -115,41 +129,6 @@ const initChatArea = (state, socket) => () => {
   chatAreaEl.avatars = config.users;
   console.log("chatAreaEl:", chatAreaEl);
   mainEl.appendChild(chatAreaEl);
-
-  const msg1 = {
-    username: "user_a",
-    urls: [],
-    timestamp: Date.now(),
-    text:
-      "connectedCallback() fires when the element is inserted into the DOM. https://i.imgur.com/Q6pAkWlb.jpg https://i.imgur.com/Jt9fyBZb.jpg",
-  };
-
-  const msg2 = {
-    username: "user_a",
-    urls: [],
-    timestamp: Date.now(),
-    text:
-      "If that’s you, you’ll probably need to @import whatever global stylesheets you can to bring in those global styles and hope t.",
-  };
-  const msg3 = {
-    username: "user_b",
-    urls: [],
-    timestamp: Date.now(),
-    text: "connectedCallback() fires when the element is ",
-  };
-  const msg4 = {
-    username: "user_b",
-    self: true,
-    urls: [],
-    timestamp: Date.now(),
-    text:
-      "connectedCallback() fires when the element is inserted into the DOM. It's a good place to set the initial role, tabindex, internal state, and install event listeners.",
-  };
-
-  setTimeout(() => addMessageToList(state, chatAreaEl)(msg1), 500);
-  setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 2000);
-  setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 3500);
-  setTimeout(() => addMessageToList(state, chatAreaEl)(msg4), 4500);
 };
 
 const receiveChatMessage = (state) => (payload) => {
@@ -160,15 +139,67 @@ const receiveChatMessage = (state) => (payload) => {
   }
 };
 
+
+
+
+
+
+const addDemoMessages = (state) => {
+  const chatAreaEl = document.querySelector("chat-area");
+  const msg1 = {
+    username: "user_a",
+    urls: [],
+    timestamp: Date.now(),
+    text:
+      "Cats are believed to be the only mammals who don’t taste sweetness. https://i.imgur.com/Q6pAkWlb.jpg https://i.imgur.com/Jt9fyBZb.jpg",
+  };
+
+  const msg2 = {
+    username: "user_a",
+    urls: [],
+    timestamp: Date.now(),
+    text:
+      "Cats are nearsighted, but their peripheral vision and night vision are much better than that of humans.",
+  };
+  const msg3 = {
+    username: "user_c",
+    urls: [],
+    timestamp: Date.now(),
+    text: "Cats are supposed to have 18 toes (five toes on each front paw; four toes on each back paw).",
+  };
+  const msg4 = {
+    username: "user_b",
+    self: true,
+    urls: [],
+    timestamp: Date.now(),
+    text:
+      "Cats can jump up to six times their length.",
+  };
+
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg1), 500);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 1000);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg3), 2500);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg4), 3000);
+};
+
+const resetStateSettings = (state) => {
+  localStorage.clear();
+  state = initSettings({ ...state, ...initialState });
+  const settingsModalEl = document.querySelector("settings-modal");
+
+  settingsModalEl.setAttribute(
+    "radio-clock-display",
+    state["radio-clock-display"]
+  );
+  settingsModalEl.setAttribute(
+    "radio-send-shortcut",
+    state["radio-send-shortcut"]
+  );
+};
+
 // Listen for DOM to load, before setting up
 document.addEventListener("DOMContentLoaded", async () => {
   window.EventBus = new EventBus();
-
-  //STATE - INITIAL SETTINGS
-  const initialState = {
-    "radio-clock-display": "24h",
-    "radio-send-shortcut": "true",
-  };
 
   // SETTINGS - INIT
   let state = initSettings(initialState);
@@ -198,7 +229,43 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 
   window.EventBus.addEventListener("open_settings", () => {
-    console.log("open_settings:");
+    const mainEl = document.querySelector("main");
+    const settingsModalEl = document.createElement("settings-modal");
+    mainEl.appendChild(settingsModalEl);
+
+    settingsModalEl.setAttribute(
+      "radio-clock-display",
+      state["radio-clock-display"]
+    );
+    settingsModalEl.setAttribute(
+      "radio-send-shortcut",
+      state["radio-send-shortcut"]
+    );
+  });
+
+  window.EventBus.addEventListener("radio-group-change", (e) => {
+    localStorage.setItem(e.detail.key, e.detail.value);
+    state[e.detail.key] = e.detail.value;
+
+    if (e.detail.key === "radio-clock-display") {
+      window.EventBus.dispatchEvent("change_timeformat", {
+        value: e.detail.value,
+      });
+    }
+
+    if (e.detail.key === "radio-send-shortcut") {
+      window.EventBus.dispatchEvent("change_keysend", {
+        value: e.detail.value,
+      });
+    }
+  });
+
+  window.EventBus.addEventListener("settings-reset", () => {
+    resetStateSettings(state);
+  });
+
+  window.EventBus.addEventListener("demo-messages", () => {
+    addDemoMessages(state);
   });
 
   window.EventBus.addEventListener("send_message", (e) => {

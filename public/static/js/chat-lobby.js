@@ -22,6 +22,7 @@ template.innerHTML = `
 
       .lobby-container {
         display: flex;
+       
         flex-direction: column;
         /* height: 100%; */
         padding: 2rem;
@@ -41,6 +42,8 @@ template.innerHTML = `
 
     .avatar-button-group {
         display:flex;
+        justify-content:center;
+        flex-wrap:wrap;
     }
 
     .avatar-button {
