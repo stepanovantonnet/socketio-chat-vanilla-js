@@ -140,10 +140,6 @@ const receiveChatMessage = (state) => (payload) => {
 };
 
 
-
-
-
-
 const addDemoMessages = (state) => {
   const chatAreaEl = document.querySelector("chat-area");
   const msg1 = {
@@ -151,7 +147,7 @@ const addDemoMessages = (state) => {
     urls: [],
     timestamp: Date.now(),
     text:
-      "Cats are believed to be the only mammals who don’t taste sweetness. https://i.imgur.com/Q6pAkWlb.jpg https://i.imgur.com/Jt9fyBZb.jpg",
+      "Cats are believed to be the only mammals who don’t taste sweetness. https://images.unsplash.com/photo-1601758065893-25c11bfa69b5?ixid=MXwxMjA3fDF8MHxzZWFyY2h8MXx8Y2F0fGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60 https://images.unsplash.com/photo-1574158622682-e40e69881006?ixid=MXwxMjA3fDB8MHxzZWFyY2h8N3x8Y2F0fGVufDB8fDB8&ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=60",
   };
 
   const msg2 = {
@@ -175,11 +171,20 @@ const addDemoMessages = (state) => {
     text:
       "Cats can jump up to six times their length.",
   };
+  const msg5 = {
+    username: "user_a",
+    self: true,
+    urls: [],
+    timestamp: Date.now(),
+    text:
+      "Cats have 230 bones, while humans only have 206.https://i.imgur.com/0LINzxsb.jpg https://i.imgur.com/KWvtdg0b.jpg",
+  };
 
   setTimeout(() => addMessageToList(state, chatAreaEl)(msg1), 500);
   setTimeout(() => addMessageToList(state, chatAreaEl)(msg2), 1000);
   setTimeout(() => addMessageToList(state, chatAreaEl)(msg3), 2500);
   setTimeout(() => addMessageToList(state, chatAreaEl)(msg4), 3000);
+  setTimeout(() => addMessageToList(state, chatAreaEl)(msg5), 3500);
 };
 
 const resetStateSettings = (state) => {

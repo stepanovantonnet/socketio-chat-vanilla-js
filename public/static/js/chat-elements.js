@@ -161,11 +161,13 @@ imageTemplate.innerHTML = `
       
       .image-container {
           height:100px;
-          width:100px;
+          max-width:150px;
+          /* width:100px; */
       }
       .image-container img {
         width:100%;
         height:100%;
+        object-fit:cover;
       }
 
 

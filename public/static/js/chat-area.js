@@ -105,13 +105,12 @@ window.customElements.define(
     //
     addMessage(message) {
       const { username, urls, timestamp, text, self } = message;
+      // find previous message to apply different avatar styling
       const prevMessage = this.messages[this.messages.length - 1];
 
       this.messages.push(message);
-      
+
       const msgCard = document.createElement("message-card");
-      console.log('message:', message)
-      //console.log("prevMessage:", prevMessage, username);
       const hideAvatar = prevMessage && prevMessage.username === username;
       const user = this._avatarSelector(username) || {};
 
@@ -132,12 +131,14 @@ window.customElements.define(
            ${
              urls &&
              urls
-               .map((url) => {
-                 //return `<message-image slot="image" class="message-image" data-src="${url}"/>`;
-                 return `<span slot="image">
-                  <message-image  class="message-image" data-src="${url}"/>
-              </span>`;
-               })
+               .map(
+                 (url) => `<span slot="image">
+                                <message-image 
+                                    class="message-image" 
+                                    data-src="${url}"
+                                />
+                            </span>`
+               )
                .join("")
            }
             <p class="text" slot="text">${text}</p>
@@ -149,7 +150,9 @@ window.customElements.define(
             />
           `;
 
+      // add message card
       this.shadowRoot.querySelector(".messages-container").appendChild(msgCard);
+
       msgCard.scrollIntoView({ block: "center", behavior: "smooth" });
     }
 
